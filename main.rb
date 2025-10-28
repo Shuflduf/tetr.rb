@@ -1,11 +1,9 @@
-# frozen_string_literal: true
+require "js"
 
-require 'ruby2d'
-
-set title: 'tetr.rb'
-
-update do
-  set background: 'random'
-end
-
-show
+canvas = JS.global[:document].getElementById("game")
+ctx = canvas.getContext("2d")
+ctx.moveTo(0, 0)
+ctx.lineTo(200, 100)
+ctx.strokeStyle = "white"
+ctx.stroke()
+puts ctx
