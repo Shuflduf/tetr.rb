@@ -33,12 +33,10 @@ class Canvas
   end
 
   def draw
-    @ctx[:fillStyle] = 'red'
-    @ctx.fillRect(0, 0, @width, @height)
-    @ctx[:fillStyle] = 'blue'
-    @ctx.fillRect(10, 10, @width - 80, @height - 80)
+    # @ctx[:fillStyle] = 'red'
+    # @ctx.fillRect(0, 0, @width, @height)
 
-    @board.draw_outline!(@ctx)
+    @board.draw_outline!(@ctx, @height, @width)
   end
 
   attr_reader :width, :height
@@ -47,19 +45,40 @@ end
 
 # game board
 class Board
-  @height = 20
-  @width = 10
-
   def initialize
-    @board = Array.new(@width, 0) { Array.new(@height, 0) }
+    @height = 20
+    @width = 10
+    @board = Array.new(@width) { Array.new(@height, 0) }
   end
 
-  def draw_outline!(ctx)
-    # tile_size
-    (0..@height).each do |y|
-      @ctx[:fillStyle] = 'black'
-      ctx.fillRect(3, 3, 50, 50)
+  def draw_outline!(ctx, screen_height, screen_width)
+    tile_size = [screen_height / (@height + 1), screen_width / (@width + 2)].min
+    offset_x = (screen_width - tile_size * (@width + 2)) / 2
+    offset_y = (screen_height - tile_size * (@height + 1)) / 2
+
+    ctx[:fillStyle] = '#262626'
+
+    @height.times do |y|
+      ctx.fillRect(offset_x, offset_y + y * tile_size, tile_size, tile_size)
+      ctx.fillRect(offset_x + (@width + 1) * tile_size, offset_y + y * tile_size, tile_size, tile_size)
     end
+
+    (0..@width + 1).each do |x|
+      ctx.fillRect(offset_x + x * tile_size, offset_y + @height * tile_size, tile_size, tile_size)
+    end
+  end
+
+  def get_color(index)
+    {
+      -1 => '#262626',
+      0 => '#FF3030',
+      1 => '#FF8330',
+      2 => '#FFD130',
+      3 => '#60EC3F',
+      4 => '#3FD2EC',
+      5 => '#3F53EC',
+      6 => '#FF4FE0',
+    }[index]
   end
 end
 
