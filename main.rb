@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'js'
+require 'json'
 
 # drawing to js canvas
 class Canvas
@@ -33,10 +34,7 @@ class Canvas
   end
 
   def draw
-    # @ctx[:fillStyle] = 'red'
-    # @ctx.fillRect(0, 0, @width, @height)
-
-    @board.draw_outline(@ctx, @height, @width)
+    @board.draw(@ctx, @height, @width)
   end
 
   attr_reader :width, :height
@@ -49,15 +47,19 @@ class Board
     @height = 20
     @width = 10
     @board = Array.new(@width) { Array.new(@height, nil) }
-    @board[3][6] = 0
-    @piece = Piece.new(0)
+    @piece = Piece.new(6)
   end
 
-  def draw_outline(ctx, screen_height, screen_width)
+  def draw(ctx, screen_height, screen_width)
     tile_size = [screen_height / (@height + 1), screen_width / (@width + 2)].min
     offset_x = (screen_width - tile_size * (@width + 2)) / 2
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
+    draw_outline(ctx, tile_size, offset_x, offset_y)
+    draw_board(ctx, tile_size, offset_x, offset_y)
+    draw_piece(ctx, tile_size, offset_x, offset_y)
+  end
 
+  def draw_outline(ctx, tile_size, offset_x, offset_y)
     ctx[:fillStyle] = '#262626'
 
     @height.times do |y|
@@ -70,12 +72,23 @@ class Board
     end
   end
 
-  def draw_board
+  def draw_board(ctx, tile_size, offset_x, offset_y)
     @board.each_with_index do |column, y|
       column.each_with_index do |color, x|
-        ctx[:fillStyle] = get_color(color)
-        ctx.fillRect(offset_x + x * tile_size, offset_y + y * tile_size, tile_size, tile_size)
+        if color
+          ctx[:fillStyle] = get_color(color)
+          ctx.fillRect(offset_x + x * tile_size, offset_y + y * tile_size, tile_size, tile_size)
+        end
       end
+    end
+  end
+
+  def draw_piece(ctx, tile_size, offset_x, offset_y)
+    ctx[:fillStyle] = get_color(@piece.index)
+    4.times do |i|
+      srs_pos = SRSTable['pieces'][@piece.index][0][i]
+      pos = [srs_pos[0] + @piece.pos[0], srs_pos[1] + @piece.pos[1]]
+      ctx.fillRect(offset_x + pos[0] * tile_size, offset_y + pos[1] * tile_size, tile_size, tile_size)
     end
   end
 
@@ -93,16 +106,33 @@ class Board
   end
 end
 
+# tetromino
 class Piece
   def initialize(index)
-    @pos[:x] = 4
-    @pos[:y] = 0
+    @pos = [4, 0]
     @index = index
   end
 
-  attr_reader :pos
+  attr_reader :pos, :index
 end
 
+# https://gist.github.com/Shuflduf/e5186328dce8ab7d38a16d73971abcee
+class SRSTable
+  @data = nil
+
+  def self.[](key)
+    @data[key]
+  end
+
+  def self.load_data
+    promise = JS.global.fetch('srs.json')
+    response = promise.await
+    json_str = response.text.await.to_s
+    @data = JSON.parse(json_str)
+  end
+end
+
+SRSTable.load_data
 board = Board.new
 _c = Canvas.new(board)
 # puts c.width
