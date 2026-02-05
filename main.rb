@@ -47,7 +47,7 @@ class Board
     @height = 20
     @width = 10
     @board = Array.new(@width) { Array.new(@height, nil) }
-    @piece = Piece.new(6)
+    @piece = Piece.new(3)
   end
 
   def draw(ctx, screen_height, screen_width)
@@ -86,7 +86,7 @@ class Board
   def draw_piece(ctx, tile_size, offset_x, offset_y)
     ctx[:fillStyle] = get_color(@piece.index)
     4.times do |i|
-      srs_pos = SRSTable['pieces'][@piece.index][0][i]
+      srs_pos = SRSTable['pieces'][@piece.index][@piece.rot][i]
       pos = [srs_pos[0] + @piece.pos[0], srs_pos[1] + @piece.pos[1]]
       ctx.fillRect(offset_x + pos[0] * tile_size, offset_y + pos[1] * tile_size, tile_size, tile_size)
     end
@@ -109,11 +109,12 @@ end
 # tetromino
 class Piece
   def initialize(index)
-    @pos = [4, 0]
+    @pos = [4, 2]
     @index = index
+    @rot = 0
   end
 
-  attr_reader :pos, :index
+  attr_reader :pos, :index, :rot
 end
 
 # https://gist.github.com/Shuflduf/e5186328dce8ab7d38a16d73971abcee
