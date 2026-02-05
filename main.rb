@@ -132,7 +132,8 @@ class Piece
   def update(delta)
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
-      @pos[1] += 1
+      # @pos[1] += 1
+      try_move([0, 1])
       @gravity_timer = 0
     end
   end
@@ -181,6 +182,7 @@ class Piece
       return false if new_pos[0] <= 0
       # TODO: fix hardcode
       return false if new_pos[0] >= 11
+      return false if new_pos[1] >= 20
 
       board_piece = @board[new_pos[0] - 1][new_pos[1]]
       return false if board_piece
