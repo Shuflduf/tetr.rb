@@ -36,7 +36,7 @@ class Canvas
     # @ctx[:fillStyle] = 'red'
     # @ctx.fillRect(0, 0, @width, @height)
 
-    @board.draw_outline!(@ctx, @height, @width)
+    @board.draw_outline(@ctx, @height, @width)
   end
 
   attr_reader :width, :height
@@ -48,10 +48,12 @@ class Board
   def initialize
     @height = 20
     @width = 10
-    @board = Array.new(@width) { Array.new(@height, 0) }
+    @board = Array.new(@width) { Array.new(@height, nil) }
+    @board[3][6] = 0
+    @piece = Piece.new(0)
   end
 
-  def draw_outline!(ctx, screen_height, screen_width)
+  def draw_outline(ctx, screen_height, screen_width)
     tile_size = [screen_height / (@height + 1), screen_width / (@width + 2)].min
     offset_x = (screen_width - tile_size * (@width + 2)) / 2
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
@@ -68,6 +70,15 @@ class Board
     end
   end
 
+  def draw_board
+    @board.each_with_index do |column, y|
+      column.each_with_index do |color, x|
+        ctx[:fillStyle] = get_color(color)
+        ctx.fillRect(offset_x + x * tile_size, offset_y + y * tile_size, tile_size, tile_size)
+      end
+    end
+  end
+
   def get_color(index)
     {
       -1 => '#262626',
@@ -80,6 +91,16 @@ class Board
       6 => '#FF4FE0',
     }[index]
   end
+end
+
+class Piece
+  def initialize(index)
+    @pos[:x] = 4
+    @pos[:y] = 0
+    @index = index
+  end
+
+  attr_reader :pos
 end
 
 board = Board.new
