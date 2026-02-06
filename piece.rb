@@ -11,12 +11,14 @@ class Piece
     @board = board
 
     @gravity_timer = 0
+    @ghost = GhostPiece.new(board)
+    @ghost.update(self)
   end
 
   def update(delta)
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
-      return true unless try_move([0, 1])
+      return true unless try_move!([0, 1])
 
       @gravity_timer = 0
     end
@@ -27,20 +29,22 @@ class Piece
     code = event[:code]
     if pressed
       if code == 'KeyA'
-        try_move([-1, 0])
+        try_move!([-1, 0])
       elsif code == 'KeyD'
-        try_move([1, 0])
+        try_move!([1, 0])
       elsif code == 'KeyW'
-        try_move([0, 1])
+        try_move!([0, 1])
       elsif code == 'ArrowRight'
-        try_rotate((@rot + 1) % 4)
+        try_rotate!((@rot + 1) % 4)
       elsif code == 'ArrowLeft'
-        try_rotate((@rot + 3) % 4)
+        try_rotate!((@rot + 3) % 4)
+      elsif code == 'KeyS'
+        harddrop!
       end
     end
   end
 
-  def try_move(vec)
+  def try_move!(vec)
     new_piece = clone
     new_piece.pos = [@pos[0], @pos[1]]
     new_piece.pos[0] += vec[0]
@@ -48,17 +52,25 @@ class Piece
     if new_piece.can_exist?
       @pos[0] += vec[0]
       @pos[1] += vec[1]
+      @ghost.update(self)
       return true
     end
     false
   end
 
-  def try_rotate(new_rot)
+  def try_rotate!(new_rot)
     new_piece = clone
     new_piece.rot = new_rot
     if new_piece.can_exist?
       @rot = new_rot
     end
+    @ghost.update(self)
+  end
+
+  def harddrop!
+    while try_move!([0, 1])
+    end
+    @gravity_timer = GRAVITY_TIME
   end
 
   def can_exist?
@@ -74,6 +86,16 @@ class Piece
       return false if board_piece
     end
     true
+  end
+
+  def draw(ctx, tile_size, offset_x, offset_y)
+    ctx[:fillStyle] = Board.get_color(@index)
+    4.times do |i|
+      srs_pos = SRSTable['pieces'][@index][@rot][i]
+      pos = [srs_pos[0] + @pos[0], srs_pos[1] + @pos[1]]
+      ctx.fillRect(offset_x + pos[0] * tile_size, offset_y + pos[1] * tile_size, tile_size, tile_size)
+    end
+    @ghost.draw(ctx, tile_size, offset_x, offset_y)
   end
 
   attr_accessor :pos, :rot

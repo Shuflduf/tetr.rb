@@ -27,7 +27,7 @@ class Board
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
     draw_outline(ctx, tile_size, offset_x, offset_y)
     draw_board(ctx, tile_size, offset_x, offset_y)
-    draw_piece(ctx, tile_size, offset_x, offset_y)
+    @piece.draw(ctx, tile_size, offset_x, offset_y)
   end
 
   def draw_outline(ctx, tile_size, offset_x, offset_y)
@@ -48,23 +48,14 @@ class Board
     @board.each_with_index do |column, x|
       column.each_with_index do |color, y|
         if color
-          ctx[:fillStyle] = get_color(color)
+          ctx[:fillStyle] = Board.get_color(color)
           ctx.fillRect(offset_x + x * tile_size, offset_y + y * tile_size, tile_size, tile_size)
         end
       end
     end
   end
 
-  def draw_piece(ctx, tile_size, offset_x, offset_y)
-    ctx[:fillStyle] = get_color(@piece.index)
-    4.times do |i|
-      srs_pos = SRSTable['pieces'][@piece.index][@piece.rot][i]
-      pos = [srs_pos[0] + @piece.pos[0], srs_pos[1] + @piece.pos[1]]
-      ctx.fillRect(offset_x + pos[0] * tile_size, offset_y + pos[1] * tile_size, tile_size, tile_size)
-    end
-  end
-
-  def get_color(index)
+  def self.get_color(index)
     {
       -1 => '#262626',
       0 => '#FF3030',
