@@ -23,21 +23,20 @@ class Piece
     false
   end
 
-  def input(event)
+  def input(event, pressed)
     code = event[:code]
-    if code == 'KeyA'
-      try_move([-1, 0])
-      # @pos[0] -= 1
-    elsif code == 'KeyD'
-      try_move([1, 0])
-      # @pos[0] += 1
-    elsif code == 'KeyW'
-      try_move([0, 1])
-      # @pos[1] += 1
-    elsif code == 'ArrowRight'
-      try_rotate((@rot + 1) % 4)
-    elsif code == 'ArrowLeft'
-      try_rotate((@rot + 3) % 4)
+    if pressed
+      if code == 'KeyA'
+        try_move([-1, 0])
+      elsif code == 'KeyD'
+        try_move([1, 0])
+      elsif code == 'KeyW'
+        try_move([0, 1])
+      elsif code == 'ArrowRight'
+        try_rotate((@rot + 1) % 4)
+      elsif code == 'ArrowLeft'
+        try_rotate((@rot + 3) % 4)
+      end
     end
   end
 

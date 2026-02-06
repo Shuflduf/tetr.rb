@@ -11,7 +11,8 @@ class Canvas
     @ctx = @canvas.getContext('2d')
     @last_frame = 0
 
-    JS.global[:window].addEventListener('keydown', ->(event) { @board.input(event) })
+    JS.global[:window].addEventListener('keydown', ->(event) { @board.input(event, true) })
+    JS.global[:window].addEventListener('keyup', ->(event) { @board.input(event, false) })
 
     process(16)
   end

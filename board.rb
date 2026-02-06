@@ -9,8 +9,8 @@ class Board
     @piece = Piece.new(rand(7), @board)
   end
 
-  def input(event)
-    @piece.input(event)
+  def input(event, pressed)
+    @piece.input(event, pressed)
   end
 
   def update(delta)
@@ -23,7 +23,7 @@ class Board
 
   def draw(ctx, screen_height, screen_width)
     tile_size = [screen_height / (@height + 1), screen_width / (@width + 2)].min
-    offset_x = (screen_width - tile_size * (@width + 2)) / 2
+    offset_x = ((screen_width - tile_size * @width) / 2)
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
     draw_outline(ctx, tile_size, offset_x, offset_y)
     draw_board(ctx, tile_size, offset_x, offset_y)
