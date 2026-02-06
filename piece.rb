@@ -5,7 +5,7 @@ class Piece
   GRAVITY_TIME = 1000
 
   def initialize(index, board)
-    @pos = [4, 2]
+    @pos = [4, 0]
     @index = index
     @rot = 0
     @board = board
@@ -21,8 +21,6 @@ class Piece
       @gravity_timer = 0
     end
     false
-    puts @pos[0]
-    # if @pos[1]
   end
 
   def input(event)
