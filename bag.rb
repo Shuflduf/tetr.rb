@@ -8,9 +8,7 @@ class Bag
   end
 
   def next
-    if @bag.empty?
-      @bag = new_shuffled
-    end
+    @bag = new_shuffled if @bag.empty?
     @upcoming << @bag.pop
     @upcoming.shift
   end

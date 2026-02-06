@@ -18,6 +18,7 @@ class Board
     placed = @piece.update(delta)
     if placed
       add_to_board!
+      try_clear!
       @piece = Piece.new(@bag.next, @board)
     end
   end
@@ -75,6 +76,34 @@ class Board
       x = @piece.pos[0] + piece_ref[i][0]
       y = @piece.pos[1] + piece_ref[i][1]
       @board[x][y] = @piece.index
+    end
+  end
+
+  def try_clear!
+    lines_to_move_down = []
+    (0...20).each do |y|
+      y = 19 - y
+      row_full = true
+      (0...10).each do |x|
+        if @board[x][y].nil?
+          row_full = false
+        end
+      end
+      lines_to_move_down << y if row_full
+    end
+    move_down!(lines_to_move_down)
+  end
+
+  def move_down!(lines)
+    removed = 0
+    lines.each do |line|
+      (0...line).each do |y|
+        y = line - y + removed
+        (0...10).each do |x|
+          @board[x][y] = @board[x][y - 1]
+        end
+      end
+      removed += 1
     end
   end
 end
