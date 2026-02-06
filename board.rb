@@ -6,7 +6,8 @@ class Board
     @height = 20
     @width = 10
     @board = Array.new(@width) { Array.new(@height, nil) }
-    @piece = Piece.new(rand(7), @board)
+    @bag = Bag.new
+    @piece = Piece.new(@bag.next, @board)
   end
 
   def input(event, pressed)
@@ -17,7 +18,7 @@ class Board
     placed = @piece.update(delta)
     if placed
       add_to_board!
-      @piece = Piece.new(rand(7), @board)
+      @piece = Piece.new(@bag.next, @board)
     end
   end
 
