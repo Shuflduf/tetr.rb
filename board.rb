@@ -7,19 +7,19 @@ class Board
     @width = 10
     @board = Array.new(@width) { Array.new(@height, nil) }
     @bag = Bag.new
-    @piece = Piece.new(@bag.next, @board)
+    @piece = Piece.new(@bag.next, @board, Inputs.new)
   end
 
-  def input(event, pressed)
-    @piece.input(event, pressed)
-  end
+  # def input(event, pressed)
+  #   @piece.input(event, pressed)
+  # end
 
   def update(delta)
     placed = @piece.update(delta)
     if placed
       add_to_board!
       try_clear!
-      @piece = Piece.new(@bag.next, @board)
+      @piece = Piece.new(@bag.next, @board, @piece.inputs)
     end
   end
 
@@ -34,7 +34,6 @@ class Board
 
   def draw_outline(ctx, tile_size, offset_x, offset_y)
     ctx[:fillStyle] = '#262626'
-    # ctx[:strokeStyle] = '#262626'
 
     @height.times do |y|
       ctx.fillRect(offset_x - tile_size, offset_y + y * tile_size, tile_size, tile_size)

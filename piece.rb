@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require 'json'
+
 # tetromino
 class Piece
   GRAVITY_TIME = 1000
 
-  def initialize(index, board)
+  def initialize(index, board, inputs)
     @pos = [4, 0]
     @index = index
     @rot = 0
@@ -13,9 +15,19 @@ class Piece
     @gravity_timer = 0
     @ghost = GhostPiece.new(board)
     @ghost.update(self)
+    @inputs = inputs
   end
 
   def update(delta)
+    @inputs.update(delta)
+    if @inputs.rot_right
+      try_rotate!((@rot + 1) % 4)
+      @inputs.rot_right = false
+    elsif @inputs.rot_left
+      try_rotate!((@rot + 3) % 4)
+      @inputs.rot_left = false
+    end
+
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
       return true unless try_move!([0, 1])
@@ -25,24 +37,24 @@ class Piece
     false
   end
 
-  def input(event, pressed)
-    code = event[:code]
-    if pressed
-      if code == 'KeyA'
-        try_move!([-1, 0])
-      elsif code == 'KeyD'
-        try_move!([1, 0])
-      elsif code == 'KeyW'
-        try_move!([0, 1])
-      elsif code == 'ArrowRight'
-        try_rotate!((@rot + 1) % 4)
-      elsif code == 'ArrowLeft'
-        try_rotate!((@rot + 3) % 4)
-      elsif code == 'KeyS'
-        harddrop!
-      end
-    end
-  end
+  # def input(event, pressed)
+  #   code = event[:code]
+  #   if pressed
+  #     if code == 'KeyA'
+  #       try_move!([-1, 0])
+  #     elsif code == 'KeyD'
+  #       try_move!([1, 0])
+  #     elsif code == 'KeyW'
+  #       try_move!([0, 1])
+  #     elsif code == 'ArrowRight'
+  #       try_rotate!((@rot + 1) % 4)
+  #     elsif code == 'ArrowLeft'
+  #       try_rotate!((@rot + 3) % 4)
+  #     elsif code == 'KeyS'
+  #       harddrop!
+  #     end
+  #   end
+  # end
 
   def try_move!(vec)
     new_piece = clone
@@ -98,7 +110,7 @@ class Piece
     @ghost.draw(ctx, tile_size, offset_x, offset_y)
   end
 
-  attr_accessor :pos, :rot
+  attr_accessor :pos, :rot, :inputs
   attr_reader :index
 end
 
@@ -111,9 +123,7 @@ class SRSTable
   end
 
   def self.load_data
-    promise = JS.global.fetch('srs.json')
-    response = promise.await
-    json_str = response.text.await.to_s
+    json_str = JS.global.fetch('srs.json').await.text.await.to_s
     @data = JSON.parse(json_str)
   end
 end
