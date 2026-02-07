@@ -36,11 +36,21 @@ class Piece
   def process_inputs!
     puts @inputs.left_timer if @inputs.left
     if @inputs.left_timer <= 0 && @inputs.left
-      puts 'MOVE'
       try_move!([-1, 0])
+    elsif @inputs.left_timer > DAS + ARR && @inputs.left
+      try_move!([-1, 0])
+      @inputs.left_timer = DAS
     end
+
     if @inputs.right_timer <= 0 && @inputs.right
       try_move!([1, 0])
+    elsif @inputs.right_timer > DAS + ARR && @inputs.right
+      try_move!([1, 0])
+      @inputs.right_timer = DAS
+    end
+    if @inputs.harddrop
+      harddrop!
+      @inputs.harddrop = false
     end
 
     if @inputs.rot_right

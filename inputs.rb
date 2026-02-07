@@ -2,8 +2,8 @@
 
 # inputs
 class Inputs
-  attr_accessor :rot_left, :rot_right
-  attr_reader :left_timer, :right_timer, :softdrop, :left, :right
+  attr_accessor :rot_left, :rot_right, :harddrop, :left_timer, :right_timer
+  attr_reader :softdrop, :left, :right
 
   def initialize
     JS.global[:window].addEventListener('keydown', ->(event) { keydown(event) })
@@ -38,6 +38,8 @@ class Inputs
       @right_timer = 0
     elsif code == 'KeyW'
       @softdrop = true
+    elsif code == 'KeyS'
+      @harddrop = true
     elsif code == 'ArrowRight'
       @rot_right = true
     elsif code == 'ArrowLeft'
