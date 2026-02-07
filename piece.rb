@@ -5,6 +5,8 @@ require 'json'
 # tetromino
 class Piece
   GRAVITY_TIME = 1000
+  DAS = 168
+  ARR = 33
 
   def initialize(index, board, inputs)
     @pos = [4, 0]
@@ -19,14 +21,8 @@ class Piece
   end
 
   def update(delta)
+    process_inputs!
     @inputs.update(delta)
-    if @inputs.rot_right
-      try_rotate!((@rot + 1) % 4)
-      @inputs.rot_right = false
-    elsif @inputs.rot_left
-      try_rotate!((@rot + 3) % 4)
-      @inputs.rot_left = false
-    end
 
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
@@ -35,6 +31,25 @@ class Piece
       @gravity_timer = 0
     end
     false
+  end
+
+  def process_inputs!
+    puts @inputs.left_timer if @inputs.left
+    if @inputs.left_timer <= 0 && @inputs.left
+      puts 'MOVE'
+      try_move!([-1, 0])
+    end
+    if @inputs.right_timer <= 0 && @inputs.right
+      try_move!([1, 0])
+    end
+
+    if @inputs.rot_right
+      try_rotate!((@rot + 1) % 4)
+      @inputs.rot_right = false
+    elsif @inputs.rot_left
+      try_rotate!((@rot + 3) % 4)
+      @inputs.rot_left = false
+    end
   end
 
   # def input(event, pressed)
