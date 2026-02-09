@@ -5,12 +5,9 @@ class Board
   def initialize
     @height = 20
     @width = 10
+    @score = Score.new
     start!
   end
-
-  # def input(event, pressed)
-  #   @piece.input(event, pressed)
-  # end
 
   def update(delta)
     status = @piece.update(delta)
@@ -46,11 +43,13 @@ class Board
     tile_size = [screen_height / (@height + 1), screen_width / (@width + 2)].min
     offset_x = ((screen_width - tile_size * @width) / 2)
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
-    draw_outline(ctx, tile_size, offset_x, offset_y)
-    draw_board(ctx, tile_size, offset_x, offset_y)
-    draw_held(ctx, tile_size, offset_x, offset_y)
-    draw_next(ctx, tile_size, offset_x, offset_y)
-    @piece.draw(ctx, tile_size, offset_x, offset_y)
+    params = [ctx, tile_size, offset_x, offset_y]
+    draw_outline(*params)
+    draw_board(*params)
+    draw_held(*params)
+    draw_next(*params)
+    @piece.draw(*params)
+    @score.draw(*params)
   end
 
   def draw_outline(ctx, tile_size, offset_x, offset_y)
@@ -138,6 +137,7 @@ class Board
       end
       lines_to_move_down << y if row_full
     end
+    @score.lines_cleared(lines_to_move_down.size - 1) unless lines_to_move_down.empty?
     move_down!(lines_to_move_down)
   end
 
