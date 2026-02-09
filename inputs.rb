@@ -9,19 +9,32 @@ class Inputs
     JS.global[:window].addEventListener('keydown', ->(event) { keydown(event) })
     JS.global[:window].addEventListener('keyup', ->(event) { keyup(event) })
 
-    @left = false
-    @right = false
-    @softdrop = false
-    @left_timer = 0
-    @right_timer = 0
+    @down = {
+      left: 0,
+      right: 0,
+      softdrop: 0,
+    }
+    @just_pressed = {
+      left: false,
+      right: false,
+      softdrop: false,
+      rot_left: false,
+      rot_right: false,
+    }
+    # @left = false
+    # @right = false
+    # @softdrop = false
+    # @left_timer = 0
+    # @right_timer = 0
 
-    @rot_left = false
-    @rot_right = false
+    # @rot_left = false
+    # @rot_right = false
   end
 
   def update(delta)
-    @left_timer += delta
-    @right_timer += delta
+    @down[:left] += delta if @down[:left].positive?
+    @down[:right] += delta if @down[:right].positive?
+    @down[:softdrop] += delta if @down[:softdrop].positive?
   end
 
   def keydown(event)
@@ -31,19 +44,20 @@ class Inputs
     code = event[:code]
     puts code
     if code == 'KeyA'
-      @left = true
-      @left_timer = 0
+      @just_pressed[:left] = true
+      @down[:left] = 1
     elsif code == 'KeyD'
-      @right = true
-      @right_timer = 0
+      @just_pressed[:right] = true
+      @down[:right] = 1
     elsif code == 'KeyW'
-      @softdrop = true
+      @just_pressed[:softdrop] = true
+      @down[:softdrop] = 1
     elsif code == 'KeyS'
-      @harddrop = true
+      @just_pressed[:harddrop] = true
     elsif code == 'ArrowRight'
-      @rot_right = true
+      @just_pressed[:rot_right] = true
     elsif code == 'ArrowLeft'
-      @rot_left = true
+      @just_pressed[:rot_left] = true
     end
   end
 
