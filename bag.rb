@@ -16,4 +16,6 @@ class Bag
   def new_shuffled
     [*0..6].shuffle
   end
+
+  attr_reader :upcoming
 end

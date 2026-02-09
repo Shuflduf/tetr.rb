@@ -43,6 +43,7 @@ class Board
     draw_outline(ctx, tile_size, offset_x, offset_y)
     draw_board(ctx, tile_size, offset_x, offset_y)
     draw_held(ctx, tile_size, offset_x, offset_y)
+    draw_next(ctx, tile_size, offset_x, offset_y)
     @piece.draw(ctx, tile_size, offset_x, offset_y)
   end
 
@@ -76,7 +77,24 @@ class Board
     ctx[:fillStyle] = Board.get_color(@held)
     offset = [-6, 1]
     SRSTable['pieces'][@held][0].each do |pos|
-      ctx.fillRect(offset_x + (pos[0] + offset[0]) * tile_size, offset_y + (pos[1] + offset[1]) * tile_size, tile_size, tile_size)
+      ctx.fillRect(
+        offset_x + (pos[0] + offset[0]) * tile_size,
+        offset_y + (pos[1] + offset[1]) * tile_size, tile_size, tile_size
+      )
+    end
+  end
+
+  def draw_next(ctx, tile_size, offset_x, offset_y)
+    offset = [12, 1]
+    5.times do |i|
+      p = @bag.upcoming[i]
+      ctx[:fillStyle] = Board.get_color(p)
+      SRSTable['pieces'][p][0].each do |pos|
+        ctx.fillRect(
+          offset_x + (pos[0] + offset[0]) * tile_size,
+          offset_y + (pos[1] + offset[1] + i * 3) * tile_size, tile_size, tile_size
+        )
+      end
     end
   end
 
