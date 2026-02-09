@@ -5,6 +5,8 @@ require 'js'
 # drawing to js canvas
 class Canvas
   def initialize(board)
+    JS.global[:document].querySelector('#loading').remove
+
     @board = board
     @canvas = JS.global[:document].getElementById('game')
     @ctx = @canvas.getContext('2d')

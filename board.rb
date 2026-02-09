@@ -74,12 +74,7 @@ class Board
   def draw_held(ctx, tile_size, offset_x, offset_y)
     return if @held.nil?
 
-    if @just_held
-      ctx[:fillStyle] = "#{Board.get_color(@held)}33"
-    else
-      ctx[:fillStyle] = Board.get_color(@held)
-    end
-
+    ctx[:fillStyle] = @just_held ? "#{Board.get_color(@held)}33" : Board.get_color(@held)
     offset = [-6, 1]
     SRSTable['pieces'][@held][0].each do |pos|
       ctx.fillRect(

@@ -10,7 +10,7 @@ class Piece
   SDF = 100
 
   def initialize(index, board, inputs)
-    @pos = [4, 0]
+    @pos = [3, 0]
     @index = index
     @rot = 0
     @board = board
@@ -71,9 +71,11 @@ class Piece
     if @inputs.just_pressed[:softdrop]
       try_move!([0, 1])
       @inputs.just_pressed[:softdrop] = false
+      @gravity_timer = 0
     elsif @inputs.down[:softdrop] > SDF
       try_move!([0, 1])
       @inputs.down[:softdrop] = 1
+      @gravity_timer = 0
     end
   end
 
