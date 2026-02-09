@@ -5,11 +5,7 @@ class Board
   def initialize
     @height = 20
     @width = 10
-    @board = Array.new(@width) { Array.new(@height, nil) }
-    @bag = Bag.new
-    @piece = Piece.new(@bag.next, @board, Inputs.new)
-    @held = nil
-    @just_held = false
+    start!
   end
 
   # def input(event, pressed)
@@ -33,7 +29,17 @@ class Board
         @piece = Piece.new(t, @board, @piece.inputs)
       end
       @just_held = true
+    elsif status == :restart
+      start!
     end
+  end
+
+  def start!
+    @board = Array.new(@width) { Array.new(@height, nil) }
+    @bag = Bag.new
+    @piece = Piece.new(@bag.next, @board, Inputs.new)
+    @held = nil
+    @just_held = false
   end
 
   def draw(ctx, screen_height, screen_width)

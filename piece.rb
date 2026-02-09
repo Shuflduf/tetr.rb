@@ -35,6 +35,9 @@ class Piece
       @inputs.just_pressed[:hold] = false
       return :hold
     end
+
+    return :restart unless can_exist?
+
     :nothing
   end
 
