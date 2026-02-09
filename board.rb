@@ -8,6 +8,8 @@ class Board
     @board = Array.new(@width) { Array.new(@height, nil) }
     @bag = Bag.new
     @piece = Piece.new(@bag.next, @board, Inputs.new)
+    @held = nil
+    @just_held = false
   end
 
   # def input(event, pressed)
@@ -15,11 +17,22 @@ class Board
   # end
 
   def update(delta)
-    placed = @piece.update(delta)
-    if placed
+    status = @piece.update(delta)
+    if status == :placed
       add_to_board!
       try_clear!
       @piece = Piece.new(@bag.next, @board, @piece.inputs)
+      @just_held = false
+    elsif status == :hold && !@just_held
+      if @held.nil?
+        @held = @piece.index
+        @piece = Piece.new(@bag.next, @board, @piece.inputs)
+      else
+        t = @held
+        @held = @piece.index
+        @piece = Piece.new(t, @board, @piece.inputs)
+      end
+      @just_held = true
     end
   end
 
@@ -29,6 +42,7 @@ class Board
     offset_y = (screen_height - tile_size * (@height + 1)) / 2
     draw_outline(ctx, tile_size, offset_x, offset_y)
     draw_board(ctx, tile_size, offset_x, offset_y)
+    draw_held(ctx, tile_size, offset_x, offset_y)
     @piece.draw(ctx, tile_size, offset_x, offset_y)
   end
 
@@ -53,6 +67,16 @@ class Board
           ctx.fillRect(offset_x + x * tile_size, offset_y + y * tile_size, tile_size, tile_size)
         end
       end
+    end
+  end
+
+  def draw_held(ctx, tile_size, offset_x, offset_y)
+    return if @held.nil?
+
+    ctx[:fillStyle] = Board.get_color(@held)
+    offset = [-6, 1]
+    SRSTable['pieces'][@held][0].each do |pos|
+      ctx.fillRect(offset_x + (pos[0] + offset[0]) * tile_size, offset_y + (pos[1] + offset[1]) * tile_size, tile_size, tile_size)
     end
   end
 

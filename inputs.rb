@@ -2,8 +2,7 @@
 
 # inputs
 class Inputs
-  attr_accessor :rot_left, :rot_right, :harddrop, :left_timer, :right_timer
-  attr_reader :softdrop, :left, :right
+  attr_accessor :just_pressed, :down
 
   def initialize
     JS.global[:window].addEventListener('keydown', ->(event) { keydown(event) })
@@ -20,15 +19,8 @@ class Inputs
       softdrop: false,
       rot_left: false,
       rot_right: false,
+      hold: false,
     }
-    # @left = false
-    # @right = false
-    # @softdrop = false
-    # @left_timer = 0
-    # @right_timer = 0
-
-    # @rot_left = false
-    # @rot_right = false
   end
 
   def update(delta)
@@ -58,19 +50,19 @@ class Inputs
       @just_pressed[:rot_right] = true
     elsif code == 'ArrowLeft'
       @just_pressed[:rot_left] = true
+    elsif code == 'ShiftLeft'
+      @just_pressed[:hold] = true
     end
   end
 
   def keyup(event)
     code = event[:code]
-    # JS.global[:console].log event
-    # if event
     if code == 'KeyA'
-      @left = false
+      @down[:left] = 0
     elsif code == 'KeyD'
-      @right = false
+      @down[:right] = 0
     elsif code == 'KeyW'
-      @softdrop = true
+      @down[:softdrop] = 0
     end
   end
 end

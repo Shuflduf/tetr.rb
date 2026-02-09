@@ -7,6 +7,7 @@ class Piece
   GRAVITY_TIME = 1000
   DAS = 168
   ARR = 33
+  SDF = 100
 
   def initialize(index, board, inputs)
     @pos = [4, 0]
@@ -26,60 +27,55 @@ class Piece
 
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
-      return true unless try_move!([0, 1])
+      return :placed unless try_move!([0, 1])
 
       @gravity_timer = 0
     end
-    false
+    if @inputs.just_pressed[:hold]
+      @inputs.just_pressed[:hold] = false
+      return :hold
+    end
+    :nothing
   end
 
   def process_inputs!
-    puts @inputs.left_timer if @inputs.left
-    if @inputs.left_timer <= 0 && @inputs.left
+    if @inputs.just_pressed[:left]
       try_move!([-1, 0])
-    elsif @inputs.left_timer > DAS + ARR && @inputs.left
+      @inputs.just_pressed[:left] = false
+    elsif @inputs.down[:left] > DAS
       try_move!([-1, 0])
-      @inputs.left_timer = DAS
+      @inputs.down[:left] = DAS - ARR
     end
 
-    if @inputs.right_timer <= 0 && @inputs.right
+    if @inputs.just_pressed[:right]
       try_move!([1, 0])
-    elsif @inputs.right_timer > DAS + ARR && @inputs.right
+      @inputs.just_pressed[:right] = false
+    elsif @inputs.down[:right] > DAS
       try_move!([1, 0])
-      @inputs.right_timer = DAS
+      @inputs.down[:right] = DAS - ARR
     end
-    if @inputs.harddrop
+
+    if @inputs.just_pressed[:harddrop]
       harddrop!
-      @inputs.harddrop = false
+      @inputs.just_pressed[:harddrop] = false
     end
 
-    if @inputs.rot_right
+    if @inputs.just_pressed[:rot_right]
       try_rotate!((@rot + 1) % 4)
-      @inputs.rot_right = false
-    elsif @inputs.rot_left
+      @inputs.just_pressed[:rot_right] = false
+    elsif @inputs.just_pressed[:rot_left]
       try_rotate!((@rot + 3) % 4)
-      @inputs.rot_left = false
+      @inputs.just_pressed[:rot_left] = false
+    end
+
+    if @inputs.just_pressed[:softdrop]
+      try_move!([0, 1])
+      @inputs.just_pressed[:softdrop] = false
+    elsif @inputs.down[:softdrop] > SDF
+      try_move!([0, 1])
+      @inputs.down[:softdrop] = 1
     end
   end
-
-  # def input(event, pressed)
-  #   code = event[:code]
-  #   if pressed
-  #     if code == 'KeyA'
-  #       try_move!([-1, 0])
-  #     elsif code == 'KeyD'
-  #       try_move!([1, 0])
-  #     elsif code == 'KeyW'
-  #       try_move!([0, 1])
-  #     elsif code == 'ArrowRight'
-  #       try_rotate!((@rot + 1) % 4)
-  #     elsif code == 'ArrowLeft'
-  #       try_rotate!((@rot + 3) % 4)
-  #     elsif code == 'KeyS'
-  #       harddrop!
-  #     end
-  #   end
-  # end
 
   def try_move!(vec)
     new_piece = clone
