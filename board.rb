@@ -37,6 +37,7 @@ class Board
     @piece = Piece.new(@bag.next, @board, Inputs.new)
     @held = nil
     @just_held = false
+    @score.start!
   end
 
   def draw(ctx, screen_height, screen_width)
@@ -91,7 +92,8 @@ class Board
 
   def draw_next(ctx, tile_size, offset_x, offset_y)
     offset = [12, 1]
-    5.times do |i|
+    lookahead = 1
+    lookahead.times do |i|
       p = @bag.upcoming[i]
       ctx[:fillStyle] = Board.get_color(p)
       SRSTable['pieces'][p][0].each do |pos|

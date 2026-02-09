@@ -8,6 +8,8 @@ class Piece
   DAS = 168
   ARR = 33
   SDF = 100
+  LOCK_DELAY = 500
+  MAX_LOCK_DELAY = 2000
 
   def initialize(index, board, inputs)
     @pos = [3, 0]
@@ -15,6 +17,8 @@ class Piece
     @rot = 0
     @board = board
 
+    @lock_delay_timer = 0
+    @max_lock_delay_timer = 0
     @gravity_timer = 0
     @ghost = GhostPiece.new(board)
     @ghost.update(self)
@@ -27,10 +31,22 @@ class Piece
 
     @gravity_timer += delta
     if @gravity_timer > GRAVITY_TIME
-      return :placed unless try_move!([0, 1])
-
+      try_move!([0, 1])
       @gravity_timer = 0
     end
+
+    if touching_ground?
+      @lock_delay_timer += delta
+      @max_lock_delay_timer += delta
+    else
+      @lock_delay_timer = 0
+    end
+
+    if @lock_delay_timer > LOCK_DELAY || @max_lock_delay_timer > MAX_LOCK_DELAY
+      harddrop!
+      return :placed
+    end
+
     if @inputs.just_pressed[:hold]
       @inputs.just_pressed[:hold] = false
       return :hold
@@ -39,6 +55,12 @@ class Piece
     return :restart unless can_exist?
 
     :nothing
+  end
+
+  def touching_ground?
+    new_piece = clone
+    new_piece.pos = [@pos[0], @pos[1] + 1]
+    !new_piece.can_exist?
   end
 
   def process_inputs!
@@ -91,6 +113,7 @@ class Piece
       @pos[0] += vec[0]
       @pos[1] += vec[1]
       @ghost.update(self)
+      @lock_delay_timer = 0
       return true
     end
     false
@@ -108,7 +131,7 @@ class Piece
   def harddrop!
     while try_move!([0, 1])
     end
-    @gravity_timer = GRAVITY_TIME
+    @lock_delay_timer = LOCK_DELAY
   end
 
   def can_exist?
@@ -127,7 +150,8 @@ class Piece
   end
 
   def draw(ctx, tile_size, offset_x, offset_y)
-    ctx[:fillStyle] = Board.get_color(@index)
+    brightness = 1.0 - 0.7 * @lock_delay_timer / LOCK_DELAY
+    ctx[:fillStyle] = "hsl(from #{Board.get_color(@index)} h calc(s * #{brightness}) calc(l * #{brightness}))"
     4.times do |i|
       srs_pos = SRSTable['pieces'][@index][@rot][i]
       pos = [srs_pos[0] + @pos[0], srs_pos[1] + @pos[1]]

@@ -7,6 +7,11 @@ class Score
     @highscore = 0
   end
 
+  def start!
+    @highscore = @score if @score > @highscore
+    @score = 0
+  end
+
   def lines_cleared(num)
     @score += SRSTable['scoring_lines'][num - 1]
   end
