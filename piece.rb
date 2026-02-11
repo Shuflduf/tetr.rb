@@ -124,6 +124,17 @@ class Piece
     new_piece.rot = new_rot
     if new_piece.can_exist?
       @rot = new_rot
+    else
+      kick_index = SRSTable.get_kick_index(@rot, new_rot)
+      SRSTable['kicks'][kick_index].each do |kick_table|
+        new_piece.pos = [@pos[0] + kick_table[0], @pos[1] + kick_table[1]]
+        next unless new_piece.can_exist?
+
+        puts kick_table
+        @pos = new_piece.pos
+        @rot = new_rot
+        break
+      end
     end
     @ghost.update(self)
   end
@@ -175,5 +186,13 @@ class SRSTable
   def self.load_data
     json_str = JS.global.fetch('srs.json').await.text.await.to_s
     @data = JSON.parse(json_str)
+  end
+
+  def self.get_kick_index(before, after)
+    if after == (before + 1) % 4
+      return before * 2
+    else
+      return (before * 2 + 7) % 8
+    end
   end
 end

@@ -32,9 +32,7 @@ class Inputs
   def keydown(event)
     return if event[:repeat] == true
 
-    JS.global[:console].log(event)
     code = event[:code]
-    puts code
     if code == 'KeyA'
       @just_pressed[:left] = true
       @down[:left] = 1

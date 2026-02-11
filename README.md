@@ -13,6 +13,7 @@ image
 - [x] Auto restarting
 - [ ] SRS kicks
 - [ ] Lock delay
+  - [ ] Keeps track of lowest point and cancels harder lock if below
 - [ ] Score
 - [ ] TSpins
 - [ ] Input list
