@@ -4,6 +4,7 @@ require 'json'
 
 # tetromino
 class Piece
+  I_PIECE_INDEX = 4
   GRAVITY_TIME = 1000
   DAS = 168
   ARR = 33
@@ -126,11 +127,13 @@ class Piece
       @rot = new_rot
     else
       kick_index = SRSTable.get_kick_index(@rot, new_rot)
-      SRSTable['kicks'][kick_index].each do |kick_table|
+      puts @index == I_PIECE_INDEX
+      correct_table = @index != I_PIECE_INDEX ? SRSTable['kicks'] : SRSTable['kicks_i']
+      correct_table[kick_index].each do |kick_table|
         new_piece.pos = [@pos[0] + kick_table[0], @pos[1] + kick_table[1]]
         next unless new_piece.can_exist?
 
-        puts kick_table
+        # puts kick_table
         @pos = new_piece.pos
         @rot = new_rot
         break
