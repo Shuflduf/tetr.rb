@@ -5,6 +5,7 @@ require 'json'
 # tetromino
 class Piece
   I_PIECE_INDEX = 4
+  T_PIECE_INDEX = 6
   GRAVITY_TIME = 1000
   DAS = 168
   ARR = 33
@@ -17,6 +18,7 @@ class Piece
     @index = index
     @rot = 0
     @board = board
+    @last_tspin = :none
 
     @lock_delay_timer = 0
     @max_lock_delay_timer = 0
@@ -126,18 +128,19 @@ class Piece
     if new_piece.can_exist?
       @rot = new_rot
       @lock_delay_timer = 0
+      update_tspin(0)
     else
-      kick_index = SRSTable.get_kick_index(@rot, new_rot)
+      kick_table_index = SRSTable.get_kick_index(@rot, new_rot)
       puts @index == I_PIECE_INDEX
       correct_table = @index != I_PIECE_INDEX ? SRSTable['kicks'] : SRSTable['kicks_i']
-      correct_table[kick_index].each do |kick_table|
+      correct_table[kick_table_index].each_key do |kick_table, kick_index|
         new_piece.pos = [@pos[0] + kick_table[0], @pos[1] + kick_table[1]]
         next unless new_piece.can_exist?
 
-        # puts kick_table
         @pos = new_piece.pos
         @rot = new_rot
         @lock_delay_timer = 0
+        update_tspin(kick_index + 1)
         break
       end
     end
@@ -176,6 +179,64 @@ class Piece
     @ghost.draw(ctx, tile_size, offset_x, offset_y)
   end
 
+  def update_tspin(last_kick)
+    return if @index != T_PIECE_INDEX
+
+    current_3x3 = [
+      [@pos[0], @pos[1]],
+      [@pos[0] + 2, @pos[1]],
+      [@pos[0] + 2, @pos[1] + 2],
+      [@pos[0], @pos[1] + 2],
+    ]
+    on_front = [[0, 0], [0, 0]]
+    on_back = [[0, 0], [0, 0]]
+    2.times do |i|
+      on_front[i] = current_3x3[(i + @rot) % 4]
+      on_back[i] = current_3x3[(i + @rot + 2) % 4]
+    end
+
+    if last_kick == 0
+      on_front.each do |pos|
+        if @board[pos[0]][pos[1]].null?
+          @last_tspin = :none
+          return
+        end
+      end
+      on_back.each do |pos|
+        if !@board[pos[0]][pos[1]].null?
+          @last_tspin = :regular
+          return
+        end
+      end
+    elsif last_kick == 4
+      on_back.each do |pos|
+        if @board[pos[0]][pos[1]].null?
+          @last_tspin = :none
+          return
+        end
+      end
+      on_front.each do |pos|
+        if !@board[pos[0]][pos[1]].null?
+          @last_tspin = :regular
+          return
+        end
+      end
+    else
+      on_back.each do |pos|
+        if @board[pos[0]][pos[1]].null?
+          @last_tspin = :none
+          return
+        end
+      end
+      on_front.each do |pos|
+        if !@board[pos[0]][pos[1]].null?
+          @last_tspin = :mini
+          return
+        end
+      end
+    end
+  end
+
   attr_accessor :pos, :rot, :inputs
   attr_reader :index
 end
@@ -195,9 +256,9 @@ class SRSTable
 
   def self.get_kick_index(before, after)
     if after == (before + 1) % 4
-      return before * 2
+      before * 2
     else
-      return (before * 2 + 7) % 8
+      (before * 2 + 7) % 8
     end
   end
 end
