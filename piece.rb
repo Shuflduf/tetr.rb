@@ -44,7 +44,7 @@ class Piece
     end
 
     if @lock_delay_timer > LOCK_DELAY || @max_lock_delay_timer > MAX_LOCK_DELAY
-      harddrop!
+      # harddrop!
       return :placed
     end
 
@@ -125,6 +125,7 @@ class Piece
     new_piece.rot = new_rot
     if new_piece.can_exist?
       @rot = new_rot
+      @lock_delay_timer = 0
     else
       kick_index = SRSTable.get_kick_index(@rot, new_rot)
       puts @index == I_PIECE_INDEX
@@ -136,6 +137,7 @@ class Piece
         # puts kick_table
         @pos = new_piece.pos
         @rot = new_rot
+        @lock_delay_timer = 0
         break
       end
     end
