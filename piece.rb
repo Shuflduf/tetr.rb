@@ -117,6 +117,7 @@ class Piece
       @pos[1] += vec[1]
       @ghost.update(self)
       @lock_delay_timer = 0
+      @last_tspin = :none
       return true
     end
     false
@@ -131,9 +132,8 @@ class Piece
       update_tspin(0)
     else
       kick_table_index = SRSTable.get_kick_index(@rot, new_rot)
-      puts @index == I_PIECE_INDEX
       correct_table = @index != I_PIECE_INDEX ? SRSTable['kicks'] : SRSTable['kicks_i']
-      correct_table[kick_table_index].each_key do |kick_table, kick_index|
+      correct_table[kick_table_index].each_with_index do |kick_table, kick_index|
         new_piece.pos = [@pos[0] + kick_table[0], @pos[1] + kick_table[1]]
         next unless new_piece.can_exist?
 
@@ -195,41 +195,41 @@ class Piece
       on_back[i] = current_3x3[(i + @rot + 2) % 4]
     end
 
-    if last_kick == 0
+    if last_kick.zero?
       on_front.each do |pos|
-        if @board[pos[0]][pos[1]].null?
+        if @board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?
           @last_tspin = :none
           return
         end
       end
       on_back.each do |pos|
-        if !@board[pos[0]][pos[1]].null?
+        if !(@board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?)
           @last_tspin = :regular
           return
         end
       end
     elsif last_kick == 4
       on_back.each do |pos|
-        if @board[pos[0]][pos[1]].null?
+        if !(@board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?)
           @last_tspin = :none
           return
         end
       end
       on_front.each do |pos|
-        if !@board[pos[0]][pos[1]].null?
+        if !(@board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?)
           @last_tspin = :regular
           return
         end
       end
     else
       on_back.each do |pos|
-        if @board[pos[0]][pos[1]].null?
+        if !(@board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?)
           @last_tspin = :none
           return
         end
       end
       on_front.each do |pos|
-        if !@board[pos[0]][pos[1]].null?
+        if !(@board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?)
           @last_tspin = :mini
           return
         end
@@ -238,7 +238,7 @@ class Piece
   end
 
   attr_accessor :pos, :rot, :inputs
-  attr_reader :index
+  attr_reader :index, :last_tspin
 end
 
 # https://gist.github.com/Shuflduf/e5186328dce8ab7d38a16d73971abcee
