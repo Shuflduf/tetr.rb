@@ -14,7 +14,6 @@ class Board
     if status == :placed
       add_to_board!
       try_clear!
-      puts @board[15][22].nil?
       puts @piece.last_tspin
       @piece = Piece.new(@bag.next, @board, @piece.inputs)
       @just_held = false
