@@ -63,4 +63,22 @@ class Inputs
       @down[:softdrop] = 0
     end
   end
+
+  def self.draw(ctx, tile_size, offset_x, offset_y)
+    lines = [
+      'LEFT: A',
+      'RIGHT: D',
+      'SOFT DROP: W',
+      'HARD DROP: S',
+      'CLOCKWISE: →',
+      'COUNTER-CLOCKWISE: ←',
+      'HOLD: LSHIFT',
+    ]
+    ctx[:textAlign] = 'right'
+    ctx[:fillStyle] = '#FFFFFF'
+    ctx[:font] = '16px "Press Start 2P"'
+    lines.each_with_index do |line, i|
+      ctx.fillText(line, offset_x - 48, (18 * tile_size) + offset_y + i * 16)
+    end
+  end
 end

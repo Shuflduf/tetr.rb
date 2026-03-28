@@ -52,6 +52,7 @@ class Board
     draw_next(*params)
     @piece.draw(*params)
     @score.draw(*params)
+    Inputs.draw(*params)
   end
 
   def draw_outline(ctx, tile_size, offset_x, offset_y)

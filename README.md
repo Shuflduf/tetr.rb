@@ -11,11 +11,12 @@ image
 - [x] Ghost piece
 - [x] 7 Bag piece system
 - [x] Auto restarting
-- [ ] SRS kicks
-- [ ] Lock delay
+- [x] SRS kicks
+- [x] Lock delay
   - [ ] Keeps track of lowest point and cancels harder lock if below
-- [ ] Score
-- [ ] TSpins
-- [ ] Input list
+- [x] Score
+- [x] TSpins
+  - [ ] scoring
+- [x] Input list
 
 
