@@ -1,9 +1,10 @@
 # tetr.rb
 Tetris clone, in RUBY
 
-Made with no Ruby-specific framework for games, everything is made with with a single JS canvas and [ruby.wasm](https://github.com/ruby/ruby.wasm).
+Made with no Ruby-specific framework for games, everything is made with with a single HTML canvas and [ruby.wasm](https://github.com/ruby/ruby.wasm).
 
-image
+![screenshot](https://github.com/user-attachments/assets/f1aea455-4dc3-4772-9f93-22ff9bc0cbe4)
+
 
 # Features
 - [x] Hard drop
